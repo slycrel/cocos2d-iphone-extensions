@@ -203,8 +203,8 @@ enum
 	
 	// need to invert Y because cocos2d is bottom-left not top-left.
 	int invertedY = (map.mapSize.height * (PixelsToPointsF(map.tileSize.height) * currentScale)) - inPosition.y;
-	int x = (inPosition.x + widthOffset) / (PixelsToPointsF(map.tileSize.width) * currentScale);
-	int y = (invertedY + heightOffset) / (PixelsToPointsF(map.tileSize.height) * currentScale);
+	int x = (inPosition.x - widthOffset) / (PixelsToPointsF(map.tileSize.width) * currentScale);
+	int y = (invertedY - heightOffset) / (PixelsToPointsF(map.tileSize.height) * currentScale);
     return ccp(x, y);
 }
 
@@ -311,7 +311,7 @@ enum
 	
 	
 	// map bounds check
-    if (playerPos.x <= (map.mapSize.width * (PixelsToPointsF(map.tileSize.width) * currentScale)) &&
+    if (playerPos.x <= (map.mapSize.width * (PixelsToPointsF(map.tileSize.width) * currentScale) + widthOffset) &&
         playerPos.y <= (map.mapSize.height * (PixelsToPointsF(map.tileSize.height) * currentScale) + heightOffset) &&
         playerPos.y >= (0 + heightOffset) &&
         playerPos.x >= (0 + widthOffset) &&
@@ -610,6 +610,10 @@ enum
 //{
 //	return 0;	// 0-360 degree rotation value for tile at x,y
 //}
+
+
+#pragma mark -
+
 
 
 @end
