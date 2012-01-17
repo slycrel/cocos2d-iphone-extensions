@@ -109,8 +109,11 @@
 	// Sample: Autorotate only in landscpe mode
 	//
 	// return YES for the supported orientations
-	
+#ifdef __TMXGenerator__
+	return ( UIInterfaceOrientationIsLandscape( interfaceOrientation ) );
+#else
 	return YES; //( UIInterfaceOrientationIsLandscape( interfaceOrientation ) );
+#endif
 	
 #else
 #error Unknown value in GAME_AUTOROTATION

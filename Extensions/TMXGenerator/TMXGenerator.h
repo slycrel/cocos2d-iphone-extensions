@@ -143,6 +143,16 @@
  */
 - (NSArray*) propertiesForObjectWithName: (NSString *) name inGroupWithName: (NSString *) groupName;
 
+/** Returns true if a given tile is flipped on it's X axis.
+ * Defaults to not rotated.
+ */
+- (BOOL) tileflippedHorizontallyAtPos:(CGPoint)inPoint;
+
+/** Returns true if a given tile is flipped on it's Y axis
+ * Defaults to not rotated.
+ */
+- (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint;
+
 /** Returns a rotation value (no rotation if this method doesn't exist) 
  * for the specified tile name and tile. */
 - (int) tileRotationForLayer:(NSString*)layerName

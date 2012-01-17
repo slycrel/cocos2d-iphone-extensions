@@ -28,6 +28,10 @@
 #import "LFCGzipUtility.h"
 #import "cencode.h"
 
+#define kFlippedHorizontallyFlag				0x80000000
+#define kFlippedVerticallyFlag					0x40000000
+#define kFlippedMask							~(kFlippedHorizontallyFlag|kFlippedVerticallyFlag)
+
 
 @interface TMXGenerator ()
 - (void) addMapAttributesWithPath:(NSString*)inPath width:(int)width height:(int)height tileWidth:(int)widthInPixels tileHeight:(int)heightInPixels orientation:(NSString*)orientation properties:(NSDictionary*)properties;
@@ -150,7 +154,7 @@
 		
 		int across = imgSize.width / (width + spacing);
 		int down = imgSize.height / (height + spacing);
-		highestGID += across * down + 10;
+		highestGID += across * down;
 
 		// add the dictionary to our tileset list.
 		if (!tileSets)
@@ -619,9 +623,22 @@
 				else 
 					GID = 0;				// default to nothing if not found.
 				
-				mapData[y][x] = GID;		// TMX Maps stored different.
 				if (GID)
+				{
+					if ([delegate_ respondsToSelector:@selector(tileflippedHorizontallyAtPos:)] &&
+						[delegate_ tileflippedHorizontallyAtPos:CGPointMake(x, y)])
+					{
+						 GID |= kFlippedHorizontallyFlag;
+					}
+					if ([delegate_ respondsToSelector:@selector(tileflippedVerticallyAtPos:)] &&
+						[delegate_ tileflippedVerticallyAtPos:CGPointMake(x, y)])
+					{
+						GID |= kFlippedVerticallyFlag;
+					}
+						 
 					hasData = YES;
+				}
+				mapData[y][x] = GID;		// TMX Maps stored different.
 			}
 		}
 		
