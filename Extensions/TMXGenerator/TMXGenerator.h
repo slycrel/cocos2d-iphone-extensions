@@ -146,12 +146,12 @@
 /** Returns true if a given tile is flipped on it's X axis.
  * Defaults to not rotated.
  */
-- (BOOL) tileflippedHorizontallyAtPos:(CGPoint)inPoint;
+- (BOOL) tileflippedHorizontallyAtPos:(CGPoint)inPoint layer:(NSString*)layerName;
 
 /** Returns true if a given tile is flipped on it's Y axis
  * Defaults to not rotated.
  */
-- (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint;
+- (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint layer:(NSString*)layerName;
 
 /** Returns a rotation value (no rotation if this method doesn't exist) 
  * for the specified tile name and tile. */

@@ -583,7 +583,7 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 
 // Flip our tiles as needed horizontally.  Obviously this is test code, you shouldn't
 // hard-code values like this.  =)
-- (BOOL) tileflippedHorizontallyAtPos:(CGPoint)inPoint
+- (BOOL) tileflippedHorizontallyAtPos:(CGPoint)inPoint layer:(NSString*)layerName
 {
 	int x = inPoint.x;
 	int y = inPoint.y;
@@ -597,7 +597,7 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 
 // Flip our tiles as needed vertically.  Obviously this is test code, you shouldn't
 // hard-code values like this.  =)
-- (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint
+- (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint layer:(NSString*)layerName
 {
 	int x = inPoint.x;
 	int y = inPoint.y;

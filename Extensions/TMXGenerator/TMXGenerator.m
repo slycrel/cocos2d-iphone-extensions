@@ -625,13 +625,13 @@
 				
 				if (GID)
 				{
-					if ([delegate_ respondsToSelector:@selector(tileflippedHorizontallyAtPos:)] &&
-						[delegate_ tileflippedHorizontallyAtPos:CGPointMake(x, y)])
+					if ([delegate_ respondsToSelector:@selector(tileflippedHorizontallyAtPos:layer:)] &&
+						[delegate_ tileflippedHorizontallyAtPos:CGPointMake(x, y) layer:key])
 					{
 						 GID |= kFlippedHorizontallyFlag;
 					}
-					if ([delegate_ respondsToSelector:@selector(tileflippedVerticallyAtPos:)] &&
-						[delegate_ tileflippedVerticallyAtPos:CGPointMake(x, y)])
+					if ([delegate_ respondsToSelector:@selector(tileflippedVerticallyAtPos:layer:)] &&
+						[delegate_ tileflippedVerticallyAtPos:CGPointMake(x, y) layer:key])
 					{
 						GID |= kFlippedVerticallyFlag;
 					}
