@@ -30,7 +30,8 @@
 
 #define kFlippedHorizontallyFlag				0x80000000
 #define kFlippedVerticallyFlag					0x40000000
-#define kFlippedMask							~(kFlippedHorizontallyFlag|kFlippedVerticallyFlag)
+#define kFlippedAntiDiagonallyFlag				0x20000000
+#define kFlippedMask							~(kFlippedHorizontallyFlag|kFlippedVerticallyFlag|kFlippedAntiDiagonallyFlag)
 
 
 @interface TMXGenerator ()
@@ -625,15 +626,44 @@
 				
 				if (GID)
 				{
-					if ([delegate_ respondsToSelector:@selector(tileflippedHorizontallyAtPos:layer:)] &&
-						[delegate_ tileflippedHorizontallyAtPos:CGPointMake(x, y) layer:key])
+					bool rotated = false;
+					if ([delegate_ respondsToSelector:@selector(tileRotationForLayer:X:Y:)])
 					{
-						 GID |= kFlippedHorizontallyFlag;
+						int rotationInDegrees = [delegate_ tileRotationForLayer:key X:x Y:y];
+						switch (rotationInDegrees)
+						{
+							case kRotationOnce:		// 90 degrees
+								GID |= kFlippedHorizontallyFlag | kFlippedAntiDiagonallyFlag;
+								rotated = true;
+								break;
+								
+							case kRotationTwice:	// 180 degrees
+								GID |= kFlippedHorizontallyFlag | kFlippedVerticallyFlag;
+								rotated = true;
+								break;
+
+							case kRotationThrice:	// 270 degrees
+								GID |= kFlippedAntiDiagonallyFlag | kFlippedVerticallyFlag;
+								rotated = true;
+								break;
+
+							default:	// 0, 360, any other value, do no rotation.
+								break;
+						}
 					}
-					if ([delegate_ respondsToSelector:@selector(tileflippedVerticallyAtPos:layer:)] &&
-						[delegate_ tileflippedVerticallyAtPos:CGPointMake(x, y) layer:key])
+					
+					if (!rotated)
 					{
-						GID |= kFlippedVerticallyFlag;
+						if ([delegate_ respondsToSelector:@selector(tileflippedHorizontallyAtPos:layer:)] &&
+							[delegate_ tileflippedHorizontallyAtPos:CGPointMake(x, y) layer:key])
+						{
+							GID |= kFlippedHorizontallyFlag;
+						}
+						if ([delegate_ respondsToSelector:@selector(tileflippedVerticallyAtPos:layer:)] &&
+							[delegate_ tileflippedVerticallyAtPos:CGPointMake(x, y) layer:key])
+						{
+							GID |= kFlippedVerticallyFlag;
+						}
 					}
 						 
 					hasData = YES;
@@ -647,23 +677,24 @@
 			NSData* data = [NSData dataWithBytes:mapData length:sizeof(unsigned int) * mapWidth * mapHeight];
 			NSMutableDictionary* dictToAdd = [NSMutableDictionary dictionaryWithDictionary:dict];
 			[dictToAdd setObject:data forKey:kTMXGeneratorLayerData];
-			
-			// rotation data in addition to map data.
-			if ([delegate_ respondsToSelector:@selector(tileRotationForLayer:X:Y:)])
-			{
-				unsigned int rotationData[mapHeight][mapWidth];
-				
-				for (int y = 0; y < mapHeight; y++)
-				{
-					for (int x = 0;  x < mapWidth; x++)
-					{
-						rotationData[y][x] = [delegate_ tileRotationForLayer:key X:x Y:y];
-					}
-				}
-				
-				NSData* data = [NSData dataWithBytes:rotationData length:sizeof(unsigned int) * mapWidth * mapHeight];
-				[dictToAdd setObject:data forKey:kTMXGeneratorLayerRotationData];
-			}
+
+			// old method deprecated in favor of the new flipping method
+//			// rotation data in addition to map data.
+//			if ([delegate_ respondsToSelector:@selector(tileRotationForLayer:X:Y:)])
+//			{
+//				unsigned int rotationData[mapHeight][mapWidth];
+//				
+//				for (int y = 0; y < mapHeight; y++)
+//				{
+//					for (int x = 0;  x < mapWidth; x++)
+//					{
+//						rotationData[y][x] = [delegate_ tileRotationForLayer:key X:x Y:y];
+//					}
+//				}
+//				
+//				NSData* data = [NSData dataWithBytes:rotationData length:sizeof(unsigned int) * mapWidth * mapHeight];
+//				[dictToAdd setObject:data forKey:kTMXGeneratorLayerRotationData];
+//			}
 			
 			if (!layers)
 				layers = [[NSMutableArray alloc] initWithCapacity:10];

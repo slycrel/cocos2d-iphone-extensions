@@ -76,6 +76,7 @@ typedef enum {
 	kOutdoorTileRock,
 	kOutdoorTileWater,
 	kOutdoorTileFlipTest,
+	kOutdoorTileRotationTest,
 	kOutdoorTileEnd
 } outdoorTileNames;
 

@@ -74,6 +74,15 @@
 #define kTMXGeneratorGroupObjectProperties		@"groupObjectProperties"
 
 
+typedef enum
+{
+	kRotationNone = 0,		// no rotation
+	kRotationOnce = 90,		// 90 degrees
+	kRotationTwice = 180,	// 180 degrees
+	kRotationThrice = 270	// 270 degrees
+} TMXGen_RotationValues;
+
+
 @protocol TMXGeneratorDelegate <NSObject>
 
 /** Returns the map's filePath to be saved to. */
@@ -153,11 +162,13 @@
  */
 - (BOOL) tileflippedVerticallyAtPos:(CGPoint)inPoint layer:(NSString*)layerName;
 
-/** Returns a rotation value (no rotation if this method doesn't exist) 
- * for the specified tile name and tile. */
-- (int) tileRotationForLayer:(NSString*)layerName
-						   X:(int)x
-						   Y:(int)y;
+/** Returns a rotation value (no rotation assumed if this 
+ * method doesn't exist) for the specified layer name and tile. 
+ * See the TMXGen_RotationValues enumeration for valid rotations
+ * to return. */
+- (TMXGen_RotationValues) tileRotationForLayer:(NSString*)layerName
+											 X:(int)x
+											 Y:(int)y;
 
 @end
 

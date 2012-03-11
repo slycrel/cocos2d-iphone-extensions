@@ -485,6 +485,11 @@ enum
 		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileFlipTest] forKey:kTileSetTypeNameKey];
 		[retVal setObject:dict forKey:@"4"];
 		
+		// tile 5
+		dict = [NSMutableDictionary dictionaryWithCapacity:10];
+		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileRotationTest] forKey:kTileSetTypeNameKey];
+		[retVal setObject:dict forKey:@"5"];
+		
 	}
 	else if ([name isEqualToString:kMetaLayerTileSetName])
 	{
@@ -556,10 +561,10 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 	{2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0},
+	{2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 2, 0, 0, 0, 0, 0},
@@ -573,11 +578,11 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 	{3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2},
 	{3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2},
 	{3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2},
-	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2},
-	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
-	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2},
+	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 5, 2, 5, 2, 5, 2, 5, 2},
 	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 5, 2, 5, 2, 5, 2, 5, 2},
 	{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 };
 
@@ -588,7 +593,7 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 	int x = inPoint.x;
 	int y = inPoint.y;
 	BOOL isEven = x % 2 == 0;
-	if (tileGenerationData[y][x] == 4 && isEven)
+	if (tileGenerationData[y][x] == kOutdoorTileFlipTest && isEven)
 		return YES;
 	
 	return NO;
@@ -602,7 +607,7 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 	int x = inPoint.x;
 	int y = inPoint.y;
 	BOOL isEven = y % 2 == 0;
-	if (tileGenerationData[y][x] == 4 && isEven)
+	if (tileGenerationData[y][x] == kOutdoorTileFlipTest && isEven)
 		return YES;
 	
 	return NO;
@@ -637,11 +642,25 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 }
 
 
-// If you had implemented rotated tiles then you would return degree rotation for the passed in tile coords on the passed layer.  We are not using (meaningful) rotation in this example.
-//- (int) tileRotationForLayer:(NSString*)layerName X:(int)x Y:(int)y
-//{
-//	return 0;	// 0-360 degree rotation value for tile at x,y
-//}
+// If you had implemented rotated tiles then you would return degree rotation for the passed in tile coords on the passed layer.
+// you should be much smarter about rotation than we are here!
+- (TMXGen_RotationValues) tileRotationForLayer:(NSString*)layerName X:(int)x Y:(int)y
+{
+	static TMXGen_RotationValues val = kRotationNone;
+	
+	// only rotate tiles of type 5
+	if (tileGenerationData[y][x] == kOutdoorTileRotationTest)
+	{
+		TMXGen_RotationValues retVal = val;
+		val += 90;
+		if (val > kRotationThrice)
+			val = 0;
+		
+		return retVal;
+	}
+	
+	return kRotationNone;
+}
 
 
 #pragma mark -
