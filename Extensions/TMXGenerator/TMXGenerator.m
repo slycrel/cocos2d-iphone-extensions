@@ -609,6 +609,7 @@
 		
 		NSString* tileSetName = [delegate_ tileSetNameForLayer:key];
 		NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
+		int startGid = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
 		
 		for (int y = 0; y < mapHeight; y++)
 		{
@@ -618,7 +619,7 @@
 				tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
 				
 				// find the tileset and then look through it to find the property key/value pair we are after.
-				int GID = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
+				int GID = startGid;
 				NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
 				if (tempStr)
 					GID += [tempStr intValue];
