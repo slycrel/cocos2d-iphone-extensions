@@ -592,6 +592,7 @@
 	// add our layers
 	NSString* tilePropertyVal;
 	NSString* tileKeyVal;
+	unsigned int mapData[mapHeight][mapWidth];
 	for (key in layerNames)
 	{
 		NSDictionary* dict = [delegate_ layerInfoForName:key];
@@ -604,7 +605,6 @@
 		
 		tileKeyVal = [delegate_ tileIdentificationKeyForLayer:key];
 		
-		unsigned int mapData[mapHeight][mapWidth];
 		BOOL hasData = NO;
 		
 		NSString* tileSetName = [delegate_ tileSetNameForLayer:key];
