@@ -592,6 +592,7 @@
 	// add our layers
 	NSString* tilePropertyVal;
 	NSString* tileKeyVal;
+	unsigned int mapData[mapHeight][mapWidth];
 	for (key in layerNames)
 	{
 		NSDictionary* dict = [delegate_ layerInfoForName:key];
@@ -604,20 +605,21 @@
 		
 		tileKeyVal = [delegate_ tileIdentificationKeyForLayer:key];
 		
-		unsigned int mapData[mapHeight][mapWidth];
 		BOOL hasData = NO;
+		
+		NSString* tileSetName = [delegate_ tileSetNameForLayer:key];
+		NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
+		int startGid = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
 		
 		for (int y = 0; y < mapHeight; y++)
 		{
 			for (int x = 0;  x < mapWidth; x++)
 			{
 				// get the tileset name and the appropriate property to look for within that tileset.
-				NSString* tileSetName = [delegate_ tileSetNameForLayer:key];
 				tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
 				
 				// find the tileset and then look through it to find the property key/value pair we are after.
-				NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
-				int GID = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
+				int GID = startGid;
 				NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
 				if (tempStr)
 					GID += [tempStr intValue];
