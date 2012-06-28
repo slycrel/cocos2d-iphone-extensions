@@ -214,12 +214,9 @@
 		for (id propertyKey in [properties allKeys])
 		{
 			NSDictionary* dict = [properties objectForKey:propertyKey];
-			if ([dict objectForKey:tileKeyVal])
-			{
-				NSString* str = [dict objectForKey:tileKeyVal];
-				if ([tilePropertyVal isEqualToString:str])
-					return propertyKey;
-			}
+			NSString* str = [dict objectForKey:tileKeyVal];
+			if (str && [tilePropertyVal isEqualToString:str])
+				return propertyKey;
 		}
 	}
 	
@@ -611,20 +608,33 @@
 		NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
 		int startGid = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
 		
+		BOOL customGIDs = NO;
+		if ([delegate_ respondsToSelector:@selector(customGIDs)] &&
+			[delegate_ respondsToSelector:@selector(tileGIDForLayer:tileSetName:X:Y:)])
+			customGIDs = [delegate_ customGIDs];
+
 		for (int y = 0; y < mapHeight; y++)
 		{
 			for (int x = 0;  x < mapWidth; x++)
 			{
-				// get the tileset name and the appropriate property to look for within that tileset.
-				tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
-				
-				// find the tileset and then look through it to find the property key/value pair we are after.
 				int GID = startGid;
-				NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
-				if (tempStr)
-					GID += [tempStr intValue];
-				else 
-					GID = 0;				// default to nothing if not found.
+
+				if (customGIDs)
+				{
+					GID = [delegate_ tileGIDForLayer:key tileSetName:tileSetName X:x Y:y];
+				}
+				else
+				{
+					// get the tileset name and the appropriate property to look for within that tileset.
+					tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
+					
+					// find the tileset and then look through it to find the property key/value pair we are after.
+					NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
+					if (tempStr)
+						GID += [tempStr intValue];
+					else 
+						GID = 0;				// default to nothing if not found.
+				}
 				
 				if (GID)
 				{

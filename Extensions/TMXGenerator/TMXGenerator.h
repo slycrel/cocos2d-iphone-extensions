@@ -170,6 +170,21 @@ typedef enum
 											 X:(int)x
 											 Y:(int)y;
 
+/*
+ * if this returns YES then GIDs are assigned based on what the delegate specifies
+ * for GIDs with the customGIDFromType: method
+ */
+- (BOOL) customGIDs;
+
+/*
+ * Returns a custom GID value for the given tile coordinates
+ */
+- (int) tileGIDForLayer:(NSString*)layerName						
+					   tileSetName:(NSString*)tileSetName					
+								 X:(int)x
+								 Y:(int)y;
+
+
 @end
 
 /** @class TMXGenerator Class that generates a single TMX map with multiple layers.
