@@ -621,7 +621,7 @@
 
 				if (customGIDs)
 				{
-					GID = [delegate_ tileGIDForLayer:key tileSetName:tileSetName X:x Y:y];
+					GID += [delegate_ tileGIDForLayer:key tileSetName:tileSetName X:x Y:y];
 				}
 				else
 				{
@@ -631,9 +631,9 @@
 					// find the tileset and then look through it to find the property key/value pair we are after.
 					NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
 					if (tempStr)
-						GID += [tempStr intValue];
-					else 
-						GID = 0;				// default to nothing if not found.
+						GID += [tempStr intValue];	// atlas offset + start GID
+					else
+						GID = 0;					// default to nothing if not found.
 				}
 				
 				if (GID)
