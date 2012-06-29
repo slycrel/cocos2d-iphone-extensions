@@ -62,17 +62,21 @@ A list of the delegate methods and optional delegate methods is below.
 - (NSArray*) tileSetNames;												// returns the names of all tilesets as NSStrings.
 - (NSArray*) objectGroupNames;											// returns the names of all the object groups as NSStrings. 
 
-- (NSString*) tileIdentificationKeyForLayer:(NSString*)layerName;		// returns the key to look for in the tile properties when assigning tiles during map creation.
 - (NSString*) tileSetNameForLayer:(NSString*)layerName;            		// returns the name of the tileset (only one right now) for the layer.
-- (NSString*) tilePropertyForLayer:(NSString*)layerName					// returns a uniquely identifying value for the key returned in the method keyForTileIdentificationForLayer:
-                tileSetName:(NSString*)tileSetName						// If the value is not found, the tile gets set to the minimum GID.
-                X:(int)x
-                Y:(int)y;
 
 
 optional delegate methods
 ----------------------------
 
+- (int) tileGIDForLayer:(NSString*)layerName							// This is the new standard way of defining your tiles.  You need to either implement
+			tileSetName:(NSString*)tileSetName							// this method or tileIdentificationKeyForLayer and tilePropertyForLayer:tileSetName:x:y
+					  X:(int)x											// in order for your tile assignment to happen.
+					  Y:(int)y;
+- (NSString*) tileIdentificationKeyForLayer:(NSString*)layerName;		// returns the key to look for in the tile properties when assigning tiles during map creation.
+- (NSString*) tilePropertyForLayer:(NSString*)layerName					// returns a uniquely identifying value for the key returned in the method keyForTileIdentificationForLayer:
+                tileSetName:(NSString*)tileSetName						// using tileIdentificationKeyForLayer you can assign GIDs via these properties.
+                X:(int)x
+                Y:(int)y;
 - (NSDictionary*) propertiesForTileSetNamed:(NSString*)name;			// returns the optional properties for a given tileset.
 - (NSArray*) propertiesForObjectWithName: (NSString *) name				// returns the optional properties for a given object in a given group.
                inGroupWithName: (NSString *) groupName;

@@ -539,7 +539,7 @@
 	{
 		if (error)
 			*error = [NSError errorWithDomain:@"Unable to get basic map info when calling delegate method mapAttributeSetup" code:0 userInfo:nil];
-		return NO;
+		return nil;
 	}
 	
 	int mapWidth = [[mapInfo objectForKey:kTMXGeneratorHeaderInfoMapWidth] intValue];
@@ -550,7 +550,7 @@
 	{
 		if (error)
 			*error = [NSError errorWithDomain:@"Unable to get any tileset names when calling delegate method tileSetNames" code:0 userInfo:nil];
-		return NO;
+		return nil;
 	}
 	
 	// add our tilesets
@@ -562,18 +562,12 @@
 		{
 			if (error)
 				*error = [NSError errorWithDomain:[NSString stringWithFormat:@"Unable to get tileset from name %@ when calling delegate method tileSetInfoForName:", key] code:0 userInfo:nil];
-			return NO;
+			return nil;
 		}
 		
 		NSDictionary* properties = nil;
 		if ([delegate_ respondsToSelector:@selector(propertiesForTileSetNamed:)])
 			properties = [delegate_ propertiesForTileSetNamed:key];
-		if (!properties)
-		{
-			if (error)
-				*error = [NSError errorWithDomain:[NSString stringWithFormat:@"Unable to get properties from tileset name %@ when calling delegate method propertiesForTileSetNamed:", key] code:0 userInfo:nil];
-			return NO;
-		}
 		
 		[self addTilesetWithDictionary:dict tileProperties:properties];
 	}
@@ -583,12 +577,12 @@
 	{
 		if (error)
 			*error = [NSError errorWithDomain:@"Unable to get any layer names when calling delegate method layerNames" code:0 userInfo:nil];
-		return NO;
+		return nil;
 	}
 	
 	// add our layers
 	NSString* tilePropertyVal;
-	NSString* tileKeyVal;
+	NSString* tileKeyVal = nil;
 	unsigned int mapData[mapHeight][mapWidth];
 	for (key in layerNames)
 	{
@@ -597,10 +591,8 @@
 		{
 			if (error)
 				*error = [NSError errorWithDomain:[NSString stringWithFormat:@"Unable to get layer from name %@ when calling delegate method layerInfoForName:", key] code:0 userInfo:nil];
-			return NO;
+			return nil;
 		}
-		
-		tileKeyVal = [delegate_ tileIdentificationKeyForLayer:key];
 		
 		BOOL hasData = NO;
 		
@@ -608,32 +600,52 @@
 		NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
 		int startGid = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
 		
-		BOOL customGIDs = NO;
-		if ([delegate_ respondsToSelector:@selector(customGIDs)] &&
-			[delegate_ respondsToSelector:@selector(tileGIDForLayer:tileSetName:X:Y:)])
-			customGIDs = [delegate_ customGIDs];
+		// if we are assigning GIDs via the tile properties and have the appropriate delegates then set that key up here.
+		if ([delegate_ respondsToSelector:@selector(tileIdentificationKeyForLayer:)] &&
+			[delegate_ respondsToSelector:@selector(tilePropertyForLayer:tileSetName:X:Y:)])
+		{
+			tileKeyVal = [delegate_ tileIdentificationKeyForLayer:key];
+		}
+
+		// if we are not using properties then we should be using custom GIDs
+		BOOL customGIDs = [delegate_ respondsToSelector:@selector(tileGIDForLayer:tileSetName:X:Y:)];
+		
+		// check for delegate creation setup.  Return an error if this is incorrect.
+		if (!customGIDs && !tileKeyVal)
+		{
+			if (error)
+				*error = [NSError errorWithDomain:@"No way to know how to assign GIDs in generateMapXML!  Set up your delegate!" code:0 userInfo:nil];
+			return nil;
+		}
 
 		for (int y = 0; y < mapHeight; y++)
 		{
 			for (int x = 0;  x < mapWidth; x++)
 			{
-				int GID = startGid;
+				int GID = startGid;						// default to the first atlas tile for each layer
 
 				if (customGIDs)
 				{
-					GID += [delegate_ tileGIDForLayer:key tileSetName:tileSetName X:x Y:y];
+					int val = [delegate_ tileGIDForLayer:key tileSetName:tileSetName X:x Y:y];
+					if (val >= 0)
+						GID += val;
+					else
+						GID = 0;
 				}
 				else
 				{
-					// get the tileset name and the appropriate property to look for within that tileset.
-					tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
-					
-					// find the tileset and then look through it to find the property key/value pair we are after.
-					NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
-					if (tempStr)
-						GID += [tempStr intValue];	// atlas offset + start GID
-					else
-						GID = 0;					// default to nothing if not found.
+					if (tileKeyVal)
+					{
+						// get the tileset name and the appropriate property to look for within that tileset.
+						tilePropertyVal = [delegate_ tilePropertyForLayer:key tileSetName:tileSetName X:x Y:y];
+						
+						// find the tileset and then look through it to find the property key/value pair we are after.
+						NSString* tempStr = [self tileIDFromTileSet:tileSetForLayer thatMatchesKey:tileKeyVal property:tilePropertyVal];
+						if (tempStr)
+							GID += [tempStr intValue];	// atlas offset + start GID
+						else
+							GID = 0;					// default to nothing if not found.
+					}
 				}
 				
 				if (GID)
@@ -727,7 +739,7 @@
 				{
 					if (error)
 						*error = [NSError errorWithDomain:[NSString stringWithFormat:@"Unable to get object group from name %@ when calling delegate method objectsGroupInfoForName:", key] code:0 userInfo:nil];
-					return NO;
+					return nil;
 				}
 				
 				// add the properties if they are defined
@@ -768,8 +780,10 @@
 		return NO;
 	
 	NSString* xml = [self generateMapXML:error];
+	if (!xml)
+		return NO;
+	
 	NSString* mapPath = [delegate_ mapFilePath];
-
 	[TMXGenerator writeTMXFileWithXML:xml fileName:mapPath];
 	
 	// copy the image atlas to the written path from the main bundle.  We can change this later as needed to copy/move from a different source.

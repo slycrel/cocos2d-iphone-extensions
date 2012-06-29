@@ -81,14 +81,14 @@ typedef enum {
 } outdoorTileNames;
 
 typedef enum {
-	kMetaTileWater = kOutdoorTileEnd,
+	kMetaTileWater = 0,
 	kMetaTileRock,
 	kMetaTileEnd
 } metaTileNames;
 
 typedef enum
 {
-	tileBase_NoCollision = kMetaTileEnd,
+	tileBase_NoCollision = 0,
 	tileBaseRock,
 	tileBaseWater,
 	tileBaseEnd

@@ -217,19 +217,17 @@ enum
 	CGPoint tileCoord = [self tileCoordForPosition:inPosition];
 	int tileGid = [layer tileGIDAt:tileCoord];
 	
-	//	// if there's a tile here, check to see what kind it is.
-	if (tileGid)
+	if ([layerName isEqualToString:kMetaLayerTileSetName])
 	{
-		NSDictionary* dict = [curMap propertiesForGID:tileGid];
-		if (dict)
-		{
-			NSString* val = [dict valueForKey:kTileSetTypeKey];
-			if (val)
-				return [val intValue];
-		}
+		if (tileGid == kMetaTileRock + layer.tileset.firstGid)
+			return tileBaseRock;
+		else if (tileGid == kMetaTileWater + layer.tileset.firstGid)
+			return tileBaseWater;
 	}
-	
-	return tileBase_NoCollision;
+	// no collision types for the background layer.
+
+	// return nothing as default
+	return 0;
 }
 
 
@@ -237,30 +235,18 @@ enum
 -(void)movePlayerPosition:(CGPoint)inPosition
 {
 	// with collision
-	int type = [self collisionTypeForTile:inPosition forLayerNamed:kMetaLayerTileSetName];
-	if (type != tileBase_NoCollision)
+	BaseTileTypes type = [self collisionTypeForTile:inPosition forLayerNamed:kMetaLayerTileSetName];
+	if (type == tileBaseRock)
 	{
-		if (type == tileBaseRock)
-		{
-			[[SimpleAudioEngine sharedEngine] playEffect:@"hit.wav"];
-			return;	// we've hit something!  Don't move!
-		}
-		else if (type == tileBaseWater)
-		{
-			[[SimpleAudioEngine sharedEngine] playEffect:@"water.wav"];
-			return;	// we've hit something!  Don't move!
-		}
+		[[SimpleAudioEngine sharedEngine] playEffect:@"hit.wav"];
+		return;	// we've hit something!  Don't move!
 	}
-	
-	type = [self collisionTypeForTile:inPosition forLayerNamed:kBackgroundLayerName];
-	if (type != tileBase_NoCollision)
+	else if (type == tileBaseWater)
 	{
-		// do some action based on a specific kind of collision here, such as a monster encounter
-//		if (type == tileForegroundMonster)
-//			[self encounter];
-	}		
-	
-	
+		[[SimpleAudioEngine sharedEngine] playEffect:@"water.wav"];
+		return;	// we've hit something!  Don't move!
+	}
+		
 	[[SimpleAudioEngine sharedEngine] playEffect:@"move.wav"];
 	
 	// animate player movement.
@@ -337,7 +323,7 @@ enum
 - (NSArray*) layerNames
 {
 	// warning!  The order these are in determines the layer heirarchy, leftmost is lowest, rightmost is highest!
-	return [NSArray arrayWithObjects:kMetaLayerTileSetName, kBackgroundLayerName, kObjectsLayerName, nil];
+	return [NSArray arrayWithObjects:kMetaLayerTileSetName, kBackgroundLayerName, nil];
 }
 
 
@@ -449,68 +435,6 @@ enum
 }
 
 
-- (NSDictionary*) propertiesForTileSetNamed:(NSString*)name
-{
-	NSMutableDictionary* retVal = [NSMutableDictionary dictionaryWithCapacity:50];
-	NSMutableDictionary* dict;
-	NSString* typeName;
-	
-	// These propertie map to the given atlas tile.
-	if ([name isEqualToString:kOutdoorTileSetName])
-	{
-		// outdoor atlas setup
-		
-		// tile 0
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileGrass] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"0"];
-		
-		// tile 1
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileDirt] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"1"];
-		
-		// tile 2
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:typeName = [NSString stringWithFormat:@"%i", kOutdoorTileRock] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"2"];
-		
-		// tile 3
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileWater] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"3"];
-		
-		// tile 4
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileFlipTest] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"4"];
-		
-		// tile 5
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", kOutdoorTileRotationTest] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"5"];
-		
-	}
-	else if ([name isEqualToString:kMetaLayerTileSetName])
-	{
-		// meta tileset ID's
-		// tile 0 in the atlas
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", tileBaseWater] forKey:kTileSetTypeKey];
-		[dict setObject:[NSString stringWithFormat:@"%i", kMetaTileWater] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"0"];
-		
-		// tile 1
-		dict = [NSMutableDictionary dictionaryWithCapacity:10];
-		[dict setObject:[NSString stringWithFormat:@"%i", tileBaseRock] forKey:kTileSetTypeKey];
-		[dict setObject:[NSString stringWithFormat:@"%i", kMetaTileRock] forKey:kTileSetTypeNameKey];
-		[retVal setObject:dict forKey:@"1"];
-	}
-	
-	return retVal;
-}
-
-
 - (NSArray*) propertiesForObjectWithName:(NSString *) name inGroupWithName: (NSString *) groupName
 {
 	// no object properties currently for any objects.
@@ -614,34 +538,6 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 }
 
 
-- (NSString*) tilePropertyForLayer:(NSString*)layerName tileSetName:(NSString*)tileSet X:(int)x Y:(int)y
-{	
-	// should return the string value of the tile type here for the appropriate layer.
-	if ([layerName isEqualToString:kBackgroundLayerName])
-	{
-		// I use numbers 0-3 for tile property names (in propertiesForTileSetNamed:) to make this code more automated.
-		// also, I use y,x so that the above reflects what gets sent out to the screen.
-		return [NSString stringWithFormat:@"%i", tileGenerationData[y][x]];
-	}
-	else if ([layerName isEqualToString:kMetaLayerTileSetName])
-	{
-		// check the background layer's map data.  If it's not passable then we return the meta tile type that corresponds to the background type.
-		// generally I would use the same values for both the meta layer and the general layer (it's less code) but for illustration
-		// purposes I've split them into two separate enumerations.  You could also create methods to convert more complex types for this as well.
-		
-		// Note that we use @"0" and @"1" for the names of the atlas tiles when defining the meta tile properties (in propertiesForTileSetNamed:).
-		// This is so we can use an enumeration elsewhere in the code to identify tiles (which is generally more descriptive and easier)
-		// and then send the value of the enumeration (0 for water, 1 for rock) back here and get the appropriate tile.
-		if (tileGenerationData[y][x] == kOutdoorTileWater)
-			return [NSString stringWithFormat:@"%i", kMetaTileWater];
-		else if (tileGenerationData[y][x] == kOutdoorTileRock)
-			return [NSString stringWithFormat:@"%i", kMetaTileRock];
-	}
-	
-	return @"No Property";
-}
-
-
 // If you had implemented rotated tiles then you would return degree rotation for the passed in tile coords on the passed layer.
 // you should be much smarter about rotation than we are here!
 - (TMXGen_RotationValues) tileRotationForLayer:(NSString*)layerName X:(int)x Y:(int)y
@@ -661,6 +557,33 @@ static int tileGenerationData[kNumTilesPerChunk][kNumTilesPerChunk] =
 	
 	return kRotationNone;
 }
+
+
+#pragma mark -
+
+
+- (BOOL) customGIDs
+{
+	return YES;
+}
+
+
+- (int) tileGIDForLayer:(NSString*)layerName tileSetName:(NSString*)tileSetName X:(int)x Y:(int)y
+{
+	int val = tileGenerationData[y][x];
+	if ([layerName isEqualToString:kMetaLayerTileSetName])
+	{
+		if (val == kOutdoorTileWater)
+			return kMetaTileWater;
+		else if (val == kOutdoorTileRock)
+			return kMetaTileRock;
+		else
+			return -1;	// no tile
+	}
+	
+	return val;
+}
+
 
 
 #pragma mark -

@@ -121,13 +121,25 @@ typedef enum
 - (NSString*) tileSetNameForLayer:(NSString*)layerName;													 
 
 
-/** Returns a uniquely identifying value for the key returned in the method 
- * keyForTileIdentificationForLayer: 
- * If the value is not found, the tile gets set to the minimum GID. */
-- (NSString*) tilePropertyForLayer:(NSString*)layerName						
-					   tileSetName:(NSString*)tileSetName					
-								 X:(int)x
-								 Y:(int)y;
+@optional
+
+/*
+ *		*** map creation delegates ***
+ *
+ * You need to either define an identification key along with the appropriate
+ * properties on your tiles or you need to set up tile GIDs for your layers!
+ *
+ */
+
+/*
+ * Returns a custom GID value for the given tile coordinates relative to the start
+ * of an atlas.  Return 0 for the layer's first atlas tile, -1 for no tile.
+ */
+- (int) tileGIDForLayer:(NSString*)layerName						
+			tileSetName:(NSString*)tileSetName					
+					  X:(int)x
+					  Y:(int)y;
+
 
 /* Returns the key to look for in the tile properties (like SQL primary key) 
  * when assigning tiles during map creation.
@@ -137,7 +149,13 @@ typedef enum
 /** Returns the properties for a given tileset. */
 - (NSDictionary*) propertiesForTileSetNamed:(NSString*)name;
 
-@optional
+/** Returns a uniquely identifying value for the key returned in the method 
+ * keyForTileIdentificationForLayer: 
+ * If the value is not found, the tile gets set to the minimum GID. */
+- (NSString*) tilePropertyForLayer:(NSString*)layerName						
+					   tileSetName:(NSString*)tileSetName					
+								 X:(int)x
+								 Y:(int)y;
 
 /* Return YES here to copy the map atlas files to the map save location.  If a map
  * is not being written, this does nothing.
@@ -169,21 +187,6 @@ typedef enum
 - (TMXGen_RotationValues) tileRotationForLayer:(NSString*)layerName
 											 X:(int)x
 											 Y:(int)y;
-
-/*
- * if this returns YES then GIDs are assigned based on what the delegate specifies
- * for GIDs with the customGIDFromType: method
- */
-- (BOOL) customGIDs;
-
-/*
- * Returns a custom GID value for the given tile coordinates
- */
-- (int) tileGIDForLayer:(NSString*)layerName						
-					   tileSetName:(NSString*)tileSetName					
-								 X:(int)x
-								 Y:(int)y;
-
 
 @end
 
