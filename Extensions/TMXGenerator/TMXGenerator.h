@@ -46,6 +46,7 @@
 #define kTMXGeneratorTileProperties				@"tileProperties"
 #define kTMXGeneratorTileSetName				@"tileSetName"
 #define kTMXGeneratorTileSetImageAtlasFilename	@"imageAtlasFilename"
+#define kTMXGeneratorDefaultTilesetName			@"defaultTilesetName"
 
 #pragma mark Layer Setup Info Keys
 
@@ -55,6 +56,7 @@
 #define kTMXGeneratorLayerData					@"layerData"
 #define kTMXGeneratorLayerRotationData			@"rotationData"
 #define kTMXGeneratorLayerIsVisible				@"visible"
+#define kTMXGeneratorDefaultLayerName			@"defaultLayerName"
 
 #pragma mark Objects Group Setup Info Keys
 
@@ -100,27 +102,6 @@ typedef enum
  * "Layer Setup Info Keys" section above. */
 - (NSDictionary*) layerInfoForName:(NSString*)name;							
 
-/** Returns the names of all the object groups as NSStrings. 
- * It's ok to return nil if don't need objects. */
-- (NSArray*) objectGroupNames;
-
-/** Returns object group information based on the name passed.  Keys listed in 
- * "Objects Group Setup Info Keys" section above.
- */
-- (NSArray*) objectsGroupInfoForName:(NSString*)name;								
-
-/** Returns all layer names as an array of NSStrings.
- * Order of array items returned here determine the heirarchy.
- */
-- (NSArray*) layerNames;											
-
-/** Returns the names of all tilesets as NSStrings. */
-- (NSArray*) tileSetNames;	
-
-/** Returns the name of the tileset (only one right now) for the layer. */
-- (NSString*) tileSetNameForLayer:(NSString*)layerName;													 
-
-
 @optional
 
 /*
@@ -157,6 +138,24 @@ typedef enum
 								 X:(int)x
 								 Y:(int)y;
 
+/** Returns the names of all tilesets as NSStrings. 
+ * If this is not implemented kTMXGeneratorDefaultTilesetName will be used.
+ */
+- (NSArray*) tileSetNames;
+
+/** Returns the name of the tileset (only one right now) for the layer.
+* If this is not implemented kTMXGeneratorDefaultTilesetName will be returned.
+*/
+- (NSString*) tileSetNameForLayer:(NSString*)layerName;
+
+/** Returns all layer names as an array of NSStrings.
+ * Order of array items returned here determine the heirarchy.
+ * Default layer name is kTMXGeneratorDefaultLayerName, and this
+ * method can be safely ignored if you have only one layer on a
+ * map.
+ */
+- (NSArray*) layerNames;
+
 /* Return YES here to copy the map atlas files to the map save location.  If a map
  * is not being written, this does nothing.
  * returning NO here skips copying tile atlases.  If you skip this you need to
@@ -165,7 +164,17 @@ typedef enum
  */
 - (BOOL) copyAtlasFileForName:(NSString*)tilesetName;
 
-/** Returns the optional properties for a given object in a given group. Keys are listed in 
+/** Returns object group information based on the name passed.  Keys listed in
+ * "Objects Group Setup Info Keys" section above.
+ * Only used if objectGroupNames does not return nil.
+ */
+- (NSArray*) objectsGroupInfoForName:(NSString*)name;
+
+/** Returns the names of all the object groups as NSStrings.
+ * It's ok to return nil if don't need objects. */
+- (NSArray*) objectGroupNames;
+
+/** Returns the optional properties for a given object in a given group. Keys are listed in
  * "Single Object Setup Info Keys" section above.
  */
 - (NSArray*) propertiesForObjectWithName: (NSString *) name inGroupWithName: (NSString *) groupName;

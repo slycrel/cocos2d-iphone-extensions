@@ -545,7 +545,13 @@
 	int mapWidth = [[mapInfo objectForKey:kTMXGeneratorHeaderInfoMapWidth] intValue];
 	int mapHeight = [[mapInfo objectForKey:kTMXGeneratorHeaderInfoMapHeight] intValue];
 	
-	NSArray* tileSetNames = [delegate_ tileSetNames];
+	
+	NSArray* tileSetNames = nil;
+	if ([delegate_ respondsToSelector:@selector(tileSetNames)])
+		tileSetNames = [delegate_ tileSetNames];
+	else
+		tileSetNames = [NSArray arrayWithObject:kTMXGeneratorDefaultTilesetName];
+	
 	if (!tileSetNames || ![tileSetNames count])
 	{
 		if (error)
@@ -572,7 +578,12 @@
 		[self addTilesetWithDictionary:dict tileProperties:properties];
 	}
 	
-	NSArray* layerNames = [delegate_ layerNames];
+	NSArray* layerNames;
+	if ([delegate_ respondsToSelector:@selector(layerNames)])
+		layerNames = [delegate_ layerNames];
+	else
+		layerNames = [NSArray arrayWithObject:kTMXGeneratorDefaultLayerName];
+
 	if (!layerNames || ![layerNames count])
 	{
 		if (error)
@@ -596,7 +607,10 @@
 		
 		BOOL hasData = NO;
 		
-		NSString* tileSetName = [delegate_ tileSetNameForLayer:key];
+		NSString* tileSetName = kTMXGeneratorDefaultTilesetName;
+		if ([delegate_ respondsToSelector:@selector(tileSetNameForLayer:)])
+			tileSetName = [delegate_ tileSetNameForLayer:key];
+		
 		NSDictionary* tileSetForLayer = [tileSets objectForKey:tileSetName];
 		int startGid = [[tileSetForLayer objectForKey:kTMXGeneratorTilesetGIDStart] intValue];
 		
@@ -726,8 +740,13 @@
 		}
 	}
 	
-	NSArray* groups = [delegate_ objectGroupNames];
-	if (groups && [groups count])	// object groups are optional, so don't throw an error if there are none just skip them.
+	NSArray* groups = nil;
+	if ([delegate_ respondsToSelector:@selector(objectGroupNames)])
+		groups = [delegate_ objectGroupNames];
+	
+	if (groups &&			// object groups are optional, so don't throw an error if there are none, just skip them.
+		[groups count] &&
+		[delegate_ respondsToSelector:@selector(objectsGroupInfoForName:)])
 	{
 		for (key in groups)
 		{
